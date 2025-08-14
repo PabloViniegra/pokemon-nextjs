@@ -349,3 +349,236 @@ export function PokemonEvolutionSkeleton() {
     </Card>
   )
 }
+
+export function PokemonMovesSkeleton() {
+  return (
+    <Card className='md:col-span-4 row-span-1'>
+      <CardHeader>
+        <Skeleton className='h-5 w-32 rounded' />
+      </CardHeader>
+      <CardBody className='space-y-4'>
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className='space-y-2'>
+            <Skeleton className='h-4 w-24 rounded' />
+            <div className='flex flex-wrap gap-2'>
+              {[...Array(5)].map((_, j) => (
+                <Skeleton key={j} className='h-6 w-20 rounded-full' />
+              ))}
+            </div>
+          </div>
+        ))}
+      </CardBody>
+    </Card>
+  )
+}
+
+export function PokemonBreedingSkeleton() {
+  return (
+    <Card className='h-full bg-gradient-to-br from-pokeblue-50 to-pokeblue-100/70 dark:from-indigo-900/30 dark:to-indigo-950/40 border-2 border-pokeblue-200/50 dark:border-indigo-900/50 shadow-lg hover:shadow-xl transition-all duration-300'>
+      <CardHeader className='px-6 pt-6 pb-0'>
+        <Skeleton className='h-6 w-20 rounded' />
+      </CardHeader>
+      <CardBody className='p-6 space-y-6'>
+        <div className='space-y-4'>
+          {/* Egg Groups */}
+          <div>
+            <Skeleton className='h-4 w-24 rounded mb-2' />
+            <div className='flex gap-2'>
+              <Skeleton className='h-7 w-16 rounded-full' />
+              <Skeleton className='h-7 w-20 rounded-full' />
+            </div>
+          </div>
+
+          {/* Gender */}
+          <div>
+            <Skeleton className='h-4 w-20 rounded mb-2' />
+            <div className='space-y-2 bg-white/60 dark:bg-indigo-950/40 backdrop-blur-sm rounded-xl p-4 border border-pokeblue-200/50 dark:border-indigo-800/50 shadow-inner'>
+              <div className='flex justify-between text-sm'>
+                <Skeleton className='h-4 w-16 rounded' />
+                <Skeleton className='h-4 w-16 rounded' />
+              </div>
+              <Skeleton className='h-2 w-full rounded-full' />
+            </div>
+          </div>
+
+          {/* Hatch Cycles and Steps */}
+          <div className='grid grid-cols-2 gap-4'>
+            <div>
+              <Skeleton className='h-4 w-28 rounded mb-2' />
+              <div className='bg-white/60 dark:bg-indigo-950/40 backdrop-blur-sm rounded-xl p-4 border border-pokeblue-200/50 dark:border-indigo-800/50 shadow-inner'>
+                <Skeleton className='h-8 w-10 rounded' />
+              </div>
+            </div>
+            <div>
+              <Skeleton className='h-4 w-28 rounded mb-2' />
+              <div className='bg-white/60 dark:bg-indigo-950/40 backdrop-blur-sm rounded-xl p-4 border border-pokeblue-200/50 dark:border-indigo-800/50 shadow-inner'>
+                <Skeleton className='h-8 w-16 rounded' />
+              </div>
+            </div>
+          </div>
+
+          {/* Capture Rate and Base Happiness */}
+          <div className='grid grid-cols-2 gap-4'>
+            <div>
+              <div className='flex justify-between mb-2'>
+                <Skeleton className='h-4 w-24 rounded' />
+                <Skeleton className='h-3 w-10 rounded' />
+              </div>
+              <div className='bg-white/60 dark:bg-indigo-950/40 backdrop-blur-sm rounded-xl p-4 border border-pokeblue-200/50 dark:border-indigo-800/50 shadow-inner'>
+                <Skeleton className='h-8 w-10 rounded mb-2' />
+                <Skeleton className='h-2 w-full rounded-full' />
+              </div>
+            </div>
+            <div>
+              <Skeleton className='h-4 w-24 rounded mb-2' />
+              <div className='bg-white/60 dark:bg-indigo-950/40 backdrop-blur-sm rounded-xl p-4 border border-pokeblue-200/50 dark:border-indigo-800/50 shadow-inner'>
+                <Skeleton className='h-8 w-10 rounded mb-2' />
+                <Skeleton className='h-2 w-full rounded-full' />
+              </div>
+            </div>
+          </div>
+
+          {/* Growth Rate */}
+          <div>
+            <Skeleton className='h-4 w-24 rounded mb-2' />
+            <div className='bg-white/60 dark:bg-indigo-950/40 backdrop-blur-sm rounded-xl p-4 border border-pokeblue-200/50 dark:border-indigo-800/50 shadow-inner'>
+              <Skeleton className='h-7 w-24 rounded-full' />
+            </div>
+          </div>
+        </div>
+      </CardBody>
+    </Card>
+  )
+}
+
+export function SavedPageSkeleton() {
+  return (
+    <div className='space-y-4'>
+      <div className='flex items-center justify-between'>
+        <Skeleton className='h-8 w-40 rounded' />
+        <div className='flex gap-2'>
+          <Skeleton className='h-9 w-28 rounded' />
+          <Skeleton className='h-9 w-28 rounded' />
+        </div>
+      </div>
+
+      <div>
+        <div className='flex gap-3 mb-4'>
+          <Skeleton className='h-10 w-32 rounded-full' />
+          <Skeleton className='h-10 w-32 rounded-full' />
+        </div>
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4'>
+          {Array.from({ length: 8 }).map((_, i) => (
+            <Card key={i} className='rounded-2xl border border-pokegray-200'>
+              <CardBody className='p-4 space-y-4'>
+                <div className='flex items-center justify-between'>
+                  <Skeleton className='h-5 w-16 rounded-full' />
+                  <div className='flex gap-2'>
+                    <Skeleton className='h-6 w-6 rounded-full' />
+                    <Skeleton className='h-6 w-6 rounded-full' />
+                  </div>
+                </div>
+                <div className='flex justify-center'>
+                  <Skeleton className='h-40 w-40 rounded-xl' />
+                </div>
+                <Skeleton className='h-5 w-28 rounded mx-auto' />
+                <div className='flex justify-center gap-2'>
+                  <Skeleton className='h-6 w-14 rounded-full' />
+                  <Skeleton className='h-6 w-16 rounded-full' />
+                </div>
+                <div className='space-y-2'>
+                  <Skeleton className='h-2 w-full rounded-full' />
+                  <Skeleton className='h-2 w-5/6 rounded-full' />
+                  <Skeleton className='h-2 w-2/3 rounded-full' />
+                  <Skeleton className='h-2 w-3/4 rounded-full' />
+                </div>
+              </CardBody>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export function SavedGridSkeleton() {
+  return (
+    <section className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4'>
+      {Array.from({ length: 8 }).map((_, i) => (
+        <Card key={i} className='rounded-2xl border border-pokegray-200'>
+          <CardBody className='p-4 space-y-4'>
+            <div className='flex items-center justify-between'>
+              <Skeleton className='h-5 w-16 rounded-full' />
+              <div className='flex gap-2'>
+                <Skeleton className='h-6 w-6 rounded-full' />
+                <Skeleton className='h-6 w-6 rounded-full' />
+              </div>
+            </div>
+            <div className='flex justify-center'>
+              <Skeleton className='h-40 w-40 rounded-xl' />
+            </div>
+            <Skeleton className='h-5 w-28 rounded mx-auto' />
+            <div className='flex justify-center gap-2'>
+              <Skeleton className='h-6 w-14 rounded-full' />
+              <Skeleton className='h-6 w-16 rounded-full' />
+            </div>
+            <div className='space-y-2'>
+              <Skeleton className='h-2 w-full rounded-full' />
+              <Skeleton className='h-2 w-5/6 rounded-full' />
+              <Skeleton className='h-2 w-2/3 rounded-full' />
+              <Skeleton className='h-2 w-3/4 rounded-full' />
+            </div>
+          </CardBody>
+        </Card>
+      ))}
+    </section>
+  )
+}
+
+export function RegionsSkeleton() {
+  return (
+    <Card>
+      <CardBody className='divide-y divide-pokegray-200 p-0'>
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className='p-4 space-y-3'>
+            <div className='flex items-center justify-between'>
+              <div className='flex items-center gap-3'>
+                <Skeleton className='h-4 w-10 rounded' />
+                <Skeleton className='h-5 w-32 rounded' />
+                <Skeleton className='h-5 w-20 rounded-full' />
+              </div>
+              <div className='flex gap-2'>
+                <Skeleton className='h-6 w-20 rounded-full' />
+                <Skeleton className='h-6 w-24 rounded-full' />
+                <Skeleton className='h-6 w-24 rounded-full' />
+              </div>
+            </div>
+            <div className='grid grid-cols-1 md:grid-cols-3 gap-4 pt-2'>
+              <div className='border border-pokegray-200 rounded-xl p-4'>
+                <Skeleton className='h-3 w-24 rounded mb-3' />
+                <div className='flex gap-2'>
+                  <Skeleton className='h-6 w-16 rounded-full' />
+                  <Skeleton className='h-6 w-20 rounded-full' />
+                </div>
+              </div>
+              <div className='border border-pokegray-200 rounded-xl p-4'>
+                <Skeleton className='h-3 w-24 rounded mb-3' />
+                <div className='flex gap-2'>
+                  <Skeleton className='h-6 w-16 rounded-full' />
+                  <Skeleton className='h-6 w-20 rounded-full' />
+                </div>
+              </div>
+              <div className='border border-pokegray-200 rounded-xl p-4'>
+                <Skeleton className='h-3 w-24 rounded mb-3' />
+                <div className='flex gap-2'>
+                  <Skeleton className='h-9 w-28 rounded' />
+                  <Skeleton className='h-9 w-28 rounded' />
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </CardBody>
+    </Card>
+  )
+}

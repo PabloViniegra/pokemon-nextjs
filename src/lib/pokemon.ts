@@ -2,8 +2,11 @@ import {
   EvolutionChainResp,
   EvolutionDetail,
   EvolutionNode,
+  NamedAPI,
   Pokemon,
   PokemonList,
+  RegionDetail,
+  SpeciesBreeding,
   SpeciesResp,
   TypeResp,
 } from '@/types'
@@ -122,60 +125,13 @@ export async function getSpecies(idOrName: string) {
   const r = await fetch(`${POKEMON_API}/pokemon-species/${idOrName}`, {
     next: { revalidate: 86400 },
   })
-  if (!r.ok) throw new Error('No se pudo obtener species')
+
+  if (!r.ok) {
+    console.warn(`Species no encontrada para ${idOrName}`)
+    return null
+  }
+
   return (await r.json()) as SpeciesResp
-}
-
-export async function getChainByUrl(url: string) {
-  const r = await fetch(url, { next: { revalidate: 86400 } })
-  if (!r.ok) throw new Error('No se pudo obtener evolution-chain')
-  const data = (await r.json()) as EvolutionChainResp
-  return flattenChain(data.chain)
-}
-
-function extractIdFromUrl(url: string) {
-  const parts = url.split('/').filter(Boolean)
-  return Number(parts[parts.length - 1])
-}
-
-function flattenChain(
-  node: EvolutionNode,
-  acc: Array<{
-    id: number
-    name: string
-    stage: number
-    from: string | null
-    minLevel: number | null
-    trigger: string | null
-    item: string | null
-    timeOfDay: string | null
-    moveType: string | null
-    location: string | null
-  }> = [],
-  stage = 0,
-  from: string | null = null
-) {
-  const id = extractIdFromUrl(node.species.url)
-  const d = node.evolution_details?.[0] ?? ({} as EvolutionDetail)
-
-  acc.push({
-    id,
-    name: node.species.name,
-    stage,
-    from,
-    minLevel: d?.min_level ?? null,
-    trigger: d?.trigger?.name ?? null,
-    item: d?.item?.name ?? d?.held_item?.name ?? null,
-    timeOfDay: d?.time_of_day ?? null,
-    moveType: d?.known_move_type?.name ?? null,
-    location: d?.location?.name ?? null,
-  })
-
-  node.evolves_to?.forEach((child) =>
-    flattenChain(child, acc, stage + 1, node.species.name)
-  )
-
-  return acc
 }
 
 export async function getPokemonImage(name: string) {
@@ -189,4 +145,66 @@ export async function getPokemonImage(name: string) {
     data?.sprites?.front_default ??
     null
   )
+}
+
+export async function getSpeciesBreeding(
+  idOrName: string
+): Promise<SpeciesBreeding | null> {
+  const r = await fetch(`${POKEMON_API}/pokemon-species/${idOrName}`, {
+    next: { revalidate: 86400 },
+  })
+
+  if (!r.ok) {
+    console.warn(`No se encontró species (breeding) para ${idOrName}`)
+    return null
+  }
+
+  const data = await r.json()
+  return {
+    gender_rate: data.gender_rate,
+    hatch_counter: data.hatch_counter,
+    egg_groups: data.egg_groups,
+    capture_rate: data.capture_rate,
+    base_happiness: data.base_happiness,
+    growth_rate: data.growth_rate,
+  }
+}
+
+export async function getPokemonName(id: number): Promise<string | null> {
+  const response = await fetch(`${POKEMON_API}/pokemon/${id}`)
+  if (!response.ok) return null
+  const data = await response.json()
+  return data.name || null
+}
+
+export async function getRegionsList(): Promise<NamedAPI[]> {
+  const r = await fetch(`${POKEMON_API}/region?limit=1000`, {
+    next: { revalidate: 86400 },
+  })
+  if (!r.ok) throw new Error('No se pudo obtener la lista de regiones')
+  const data = await r.json()
+  return data.results as NamedAPI[]
+}
+
+export async function getRegionDetail(url: string): Promise<RegionDetail> {
+  const r = await fetch(url, { next: { revalidate: 86400 } })
+  if (!r.ok) throw new Error('No se pudo obtener una región')
+  const d = await r.json()
+  return {
+    id: d.id,
+    name: d.name,
+    main_generation: d.main_generation ?? null,
+    pokedexes: d.pokedexes ?? [],
+    version_groups: d.version_groups ?? [],
+    locations: d.locations ?? [],
+  }
+}
+
+export async function fetchJson<T>(
+  url: string,
+  revalidate = 86400
+): Promise<T> {
+  const r = await fetch(url, { next: { revalidate } })
+  if (!r.ok) throw new Error(String(r.status))
+  return r.json()
 }

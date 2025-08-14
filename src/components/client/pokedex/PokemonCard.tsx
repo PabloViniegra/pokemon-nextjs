@@ -1,11 +1,12 @@
 'use client'
 
+import { useFavs } from '@/components/hooks/useFavs'
+import { useLikes } from '@/components/hooks/useLikes'
 import { ShortPokemon, typeColors } from '@/types'
 import { Card, CardHeader, CardBody, Button, Chip } from '@heroui/react'
 import { ArrowRight, Heart, Star } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
 
 export function PokemonCard({
   pokemon,
@@ -14,70 +15,9 @@ export function PokemonCard({
   pokemon: ShortPokemon
   fixedWidth?: string
 }) {
-  const [isFavorite, setIsFavorite] = useState(false)
-  const [isLiked, setIsLiked] = useState(false)
   const router = useRouter()
-
-  useEffect(() => {
-    const favorites = JSON.parse(
-      localStorage.getItem('pokemon-favorites') || '[]'
-    )
-    const likes = JSON.parse(localStorage.getItem('pokemon-likes') || '[]')
-    setIsFavorite(favorites.includes(pokemon.id))
-    setIsLiked(likes.includes(pokemon.id))
-  }, [pokemon.id])
-
-  useEffect(() => {
-    const handleStorageChange = () => {
-      const favorites = JSON.parse(
-        localStorage.getItem('pokemon-favorites') || '[]'
-      )
-      const likes = JSON.parse(localStorage.getItem('pokemon-likes') || '[]')
-      setIsFavorite(favorites.includes(pokemon.id))
-      setIsLiked(likes.includes(pokemon.id))
-    }
-
-    window.addEventListener('storage', handleStorageChange)
-    return () => window.removeEventListener('storage', handleStorageChange)
-  }, [pokemon.id])
-
-  const handleFav = () => {
-    const favorites = JSON.parse(
-      localStorage.getItem('pokemon-favorites') || '[]'
-    )
-    if (favorites.includes(pokemon.id)) {
-      localStorage.setItem(
-        'pokemon-favorites',
-        JSON.stringify(favorites.filter((id: number) => id !== pokemon.id))
-      )
-      setIsFavorite(false)
-    } else {
-      localStorage.setItem(
-        'pokemon-favorites',
-        JSON.stringify([...favorites, pokemon.id])
-      )
-      setIsFavorite(true)
-    }
-    window.dispatchEvent(new Event('storage'))
-  }
-
-  const handleLike = () => {
-    const likes = JSON.parse(localStorage.getItem('pokemon-likes') || '[]')
-    if (likes.includes(pokemon.id)) {
-      localStorage.setItem(
-        'pokemon-likes',
-        JSON.stringify(likes.filter((id: number) => id !== pokemon.id))
-      )
-      setIsLiked(false)
-    } else {
-      localStorage.setItem(
-        'pokemon-likes',
-        JSON.stringify([...likes, pokemon.id])
-      )
-      setIsLiked(true)
-    }
-    window.dispatchEvent(new Event('storage'))
-  }
+  const { isFavorite, toggleFav } = useFavs(pokemon.id)
+  const { isLiked, toggleLike } = useLikes(pokemon.id)
 
   const goToDetail = () => {
     router.push(`/pokemons/${pokemon.id}`)
@@ -115,7 +55,7 @@ export function PokemonCard({
               className={`${
                 isFavorite ? 'text-pokered-500' : 'text-pokegray-400'
               } hover:text-pokered-500 hover:bg-pokered-50 transition-colors`}
-              onPress={handleFav}
+              onPress={toggleFav}
             >
               <Heart
                 className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`}
@@ -128,7 +68,7 @@ export function PokemonCard({
               className={`${
                 isLiked ? 'text-pikachu-500' : 'text-pokegray-400'
               } hover:text-pikachu-500 hover:bg-pikachu-50 transition-colors`}
-              onPress={handleLike}
+              onPress={toggleLike}
             >
               <Star className={`w-4 h-4 ${isLiked ? 'fill-current' : ''}`} />
             </Button>

@@ -6,16 +6,17 @@ import {
   NavbarItem,
   Link as HeroLink,
   NavbarBrand,
-  Button,
 } from '@heroui/react'
 import { usePathname } from 'next/navigation'
 import Image from 'next/image'
-import { Home, BookOpen } from 'lucide-react'
+import { Home, BookOpen, Heart, Earth } from 'lucide-react'
 import Link from 'next/link'
 
 const navLinks = [
   { label: 'Dashboard', href: '/', icon: Home },
   { label: 'Pokédex', href: '/pokedex?page=1', icon: BookOpen },
+  { label: 'Regiones', href: '/regions', icon: Earth },
+  { label: 'Guardados', href: '/saved', icon: Heart },
 ]
 
 export default function AppNavbar() {

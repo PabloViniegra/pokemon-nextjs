@@ -660,3 +660,68 @@ export type EvolutionDetail = {
   known_move_type?: { name: string } | null
   location?: { name: string } | null
 }
+
+export type SpeciesBreeding = {
+  gender_rate: number
+  hatch_counter: number
+  egg_groups: { name: string; url: string }[]
+  capture_rate: number
+  base_happiness: number | null
+  growth_rate: { name: string; url: string } | null
+}
+
+export type RegionRow = {
+  id: number
+  name: string
+  generation: string | null
+  pokedexes: string[]
+  versionGroups: string[]
+  locationsCount: number
+}
+
+export type NamedAPI = { name: string; url: string }
+
+export type RegionDetail = {
+  id: number
+  name: string
+  main_generation: NamedAPI | null
+  pokedexes: NamedAPI[]
+  version_groups: NamedAPI[]
+  locations: NamedAPI[]
+}
+
+export const REGIONS = [
+  'kanto',
+  'johto',
+  'hoenn',
+  'sinnoh',
+  'unova',
+  'kalos',
+  'alola',
+  'galar',
+  'hisui',
+  'paldea',
+]
+
+export type FlatNode = {
+  name: string
+  id: number
+  from?: string
+  stage: number
+  minLevel: number | null
+  trigger: string | null
+  item: string | null
+  timeOfDay: string | null
+  moveType: string | null
+  location: string | null
+}
+
+export type EvoDetail = {
+  min_level?: number | null
+  trigger?: { name: string } | null
+  item?: { name: string } | null
+  held_item?: { name: string } | null
+  time_of_day?: string | null
+  known_move_type?: { name: string } | null
+  location?: { name: string } | null
+}

@@ -23,6 +23,7 @@ export default async function PokemonDetailServer({ id }: { id: number }) {
       stats={pokemon.stats}
       abilities={pokemon.abilities}
       cries={pokemon.cries}
+      moves={pokemon.moves}
     />
   )
 }

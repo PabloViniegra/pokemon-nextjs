@@ -5,6 +5,88 @@ import PokedexGrid from '@/components/server/PokedexGrid'
 import { PokedexGridSkeleton } from '@/components/client/skeletons/skeletons'
 import { getAllPokemonNames, getNamesByTypes } from '@/lib/pokemon'
 import PokedexPagination from '@/components/client/pokedex/PokedexPagination'
+import { Metadata } from 'next'
+
+const baseMetadata = {
+  title: 'Pokédex | Explore All Pokémon | Pokémon Dashboard',
+  description:
+    'Search and explore all Pokémon in the National Pokédex. Filter by type, find your favorite Pokémon, and discover new ones!',
+  keywords: [
+    'Pokédex',
+    'Pokémon list',
+    'Pokémon search',
+    'National Pokédex',
+    'Pokémon types',
+    'Pokémon filter',
+    'All Pokémon',
+  ],
+  openGraph: {
+    title: 'Pokédex | Explore All Pokémon | Pokémon Dashboard',
+    description:
+      'Search and filter through the complete National Pokédex. Find detailed information about all Pokémon in one place!',
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://yourdomain.com/pokedex',
+    siteName: 'Pokémon Dashboard',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Pokédex | Explore All Pokémon | Pokémon Dashboard',
+    description: 'Search and explore all Pokémon in the National Pokédex',
+  },
+  alternates: {
+    canonical: 'https://yourdomain.com/pokedex',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large' as const,
+      'max-snippet': -1,
+    },
+  },
+}
+
+export async function generateMetadata({
+  searchParams,
+}: Props): Promise<Metadata> {
+  const { q, types } = searchParams || {}
+  const typesSelected = (types ?? '').split(',').filter(Boolean)
+  const metadata = { ...baseMetadata }
+  let title = 'Pokédex | Explore All Pokémon'
+  let description = 'Search and explore all Pokémon in the National Pokédex.'
+
+  if (q) {
+    title = `Search: ${q} | Pokédex`
+    description = `Search results for "${q}" in the Pokédex.`
+  }
+
+  if (typesSelected.length > 0) {
+    const typeList = typesSelected.join(', ')
+    title = `${
+      typeList.charAt(0).toUpperCase() + typeList.slice(1)
+    } Type Pokémon | Pokédex`
+    description = `Filtered by type: ${typeList}. ${description}`
+  }
+
+  metadata.title = title
+  metadata.description = description
+  metadata.openGraph = {
+    ...metadata.openGraph,
+    title,
+    description,
+  }
+  metadata.twitter = {
+    ...metadata.twitter,
+    title,
+    description,
+  }
+
+  return metadata
+}
 
 type Props = {
   searchParams: {
@@ -18,11 +100,11 @@ type Props = {
 export const dynamic = 'force-dynamic'
 
 export default async function Pokedex({ searchParams }: Props) {
-  const q = (searchParams.q ?? '').toLowerCase().trim()
-  const page = Math.max(1, Number(searchParams.page ?? '1'))
-  const perPage = Math.min(60, Math.max(10, Number(searchParams.perPage ?? 20)))
-
-  const typesSelected = (searchParams.types ?? '')
+  const { q, page, perPage, types } = await searchParams
+  const qLower = (q ?? '').toLowerCase().trim()
+  const pageNum = Math.max(1, Number(page ?? '1'))
+  const perPageNum = Math.min(60, Math.max(10, Number(perPage ?? 20)))
+  const typesSelected = (types ?? '')
     .split(',')
     .map((t) => t.trim().toLowerCase())
     .filter(Boolean)
@@ -35,15 +117,15 @@ export default async function Pokedex({ searchParams }: Props) {
     filteredNames = allNames.filter((n) => byTypes.has(n))
   }
 
-  if (q) {
-    filteredNames = filteredNames.filter((name) => name.includes(q))
+  if (qLower) {
+    filteredNames = filteredNames.filter((name) => name.includes(qLower))
   }
 
   const total = filteredNames.length
-  const totalPages = Math.max(1, Math.ceil(total / perPage))
-  const start = (page - 1) * perPage
+  const totalPages = Math.max(1, Math.ceil(total / perPageNum))
+  const start = (pageNum - 1) * perPageNum
   const pageNames =
-    page > totalPages ? [] : filteredNames.slice(start, start + perPage)
+    pageNum > totalPages ? [] : filteredNames.slice(start, start + perPageNum)
 
   return (
     <main className='max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6'>
@@ -74,10 +156,10 @@ export default async function Pokedex({ searchParams }: Props) {
         )}
       </p>
 
-      <Suspense fallback={<PokedexGridSkeleton count={perPage} />}>
+      <Suspense fallback={<PokedexGridSkeleton count={perPageNum} />}>
         <PokedexGrid names={pageNames} />
       </Suspense>
-      <PokedexPagination page={page} totalPages={totalPages} />
+      <PokedexPagination page={pageNum} totalPages={totalPages} />
     </main>
   )
 }

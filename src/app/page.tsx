@@ -7,6 +7,53 @@ import KpiCards from '@/components/server/KpiCards'
 import RandomPokemonCards from '@/components/server/RandomPokemonCards'
 import TypeInsightsPanel from '@/components/server/TypeInsightsPanel'
 import { Suspense } from 'react'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Pokémon Dashboard | Explore Pokémon Stats & Insights',
+  description:
+    'Discover comprehensive Pokémon statistics, type insights, and random Pokémon information. Your ultimate dashboard for all things Pokémon!',
+  keywords: [
+    'Pokémon',
+    'Pokemon stats',
+    'Pokemon types',
+    'Pokemon dashboard',
+    'Pokemon insights',
+  ],
+  openGraph: {
+    title: 'Pokémon Dashboard | Explore Pokémon Stats & Insights',
+    description:
+      'Your ultimate dashboard for all things Pokémon! Explore stats, types, and more.',
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://yourdomain.com',
+    siteName: 'Pokémon Dashboard',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Pokémon Dashboard | Explore Pokémon Stats & Insights',
+    description: 'Your ultimate dashboard for all things Pokémon!',
+  },
+  alternates: {
+    canonical: 'https://yourdomain.com',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  viewport: 'width=device-width, initial-scale=1',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#1a202c' },
+  ],
+}
 
 export default function Home() {
   return (
