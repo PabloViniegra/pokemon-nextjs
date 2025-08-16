@@ -9,7 +9,7 @@ import {
 } from '@heroui/react'
 import { usePathname } from 'next/navigation'
 import Image from 'next/image'
-import { Home, BookOpen, Heart, Earth } from 'lucide-react'
+import { Home, BookOpen, Heart, Earth, Github, Globe } from 'lucide-react'
 import Link from 'next/link'
 
 const navLinks = [
@@ -76,6 +76,30 @@ export default function AppNavbar() {
             </NavbarItem>
           )
         })}
+      </NavbarContent>
+      <NavbarContent className='hidden sm:flex gap-3 ml-auto' justify='end'>
+        <NavbarItem>
+          <a
+            href='https://github.com/PabloViniegra'
+            target='_blank'
+            rel='noopener noreferrer'
+            className='flex items-center gap-2 text-base font-serif tracking-tight font-medium px-4 py-2 rounded-lg transition-all duration-200 text-white/90 hover:text-white bg-pokeblue-700/50 hover:bg-pokeblue-700 border border-pikachu-400/30 shadow-sm'
+          >
+            <Github className='size-5 text-yellow-300' />
+            <span>GitHub</span>
+          </a>
+        </NavbarItem>
+        <NavbarItem>
+          <a
+            href='https://portfolio-pablo-viniegra.netlify.app/'
+            target='_blank'
+            rel='noopener noreferrer'
+            className='flex items-center gap-2 text-base font-serif tracking-tight font-medium px-4 py-2 rounded-lg transition-all duration-200 text-white/90 hover:text-white bg-pikachu-500/20 hover:bg-pikachu-500/30 border border-pikachu-400/30 shadow-sm'
+          >
+            <Globe className='size-5 text-yellow-300' />
+            <span>Portfolio</span>
+          </a>
+        </NavbarItem>
       </NavbarContent>
     </Navbar>
   )

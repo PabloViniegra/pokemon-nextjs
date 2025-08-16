@@ -5,8 +5,10 @@ import { Card, CardBody, Chip } from '@heroui/react'
 import { ArrowRight } from 'lucide-react'
 import { useGsapFadeIn } from '@/components/hooks/useGsapFadeIn'
 import type { EvoNode } from '@/types'
+import { useRouter } from 'next/navigation'
 
 export default function EvolutionChainClient({ nodes }: { nodes: EvoNode[] }) {
+  const router = useRouter()
   const ref = useGsapFadeIn<HTMLDivElement>({ y: 30 })
   const slideW = 220
 
@@ -42,7 +44,13 @@ export default function EvolutionChainClient({ nodes }: { nodes: EvoNode[] }) {
 
               return (
                 <div key={n.id} className='flex items-center'>
-                  <div className='w-[220px]'>
+                  <div
+                    className='w-[220px] cursor-pointer transition-transform duration-200 hover:scale-105 hover:opacity-90 active:scale-95'
+                    onClick={() => router.push(`/pokemons/${n.id}`)}
+                    role='button'
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === 'Enter' && router.push(`/pokemons/${n.id}`)}
+                  >
                     <div className='relative mx-auto w-[180px] h-[180px] rounded-xl bg-white/70 dark:bg-indigo-950/40 border border-pokeblue-200/50 dark:border-indigo-800/50 flex items-center justify-center overflow-hidden'>
                       <Image
                         src={n.image}

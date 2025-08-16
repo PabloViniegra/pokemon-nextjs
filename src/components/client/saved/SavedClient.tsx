@@ -1,13 +1,15 @@
 'use client'
 
 import { useEffect, useState, useTransition } from 'react'
-import Link from 'next/link'
-import { Tabs, Tab, Button, Card, CardBody } from '@heroui/react'
-import { Heart, Star, Trash2 } from 'lucide-react'
-import { PokemonCard } from '@/components/client/pokedex/PokemonCard'
-import type { ShortPokemon } from '@/types'
+import { Tabs, Tab } from '@heroui/react'
 import { getShortPokemonsByIds } from '@/app/actions/pokemon'
 import SavedGridSkeleton from '@/components/client/skeletons/skeletons'
+import { readIds, getCounts } from '@/lib/storage-utils'
+import SavedActions from './SavedActions'
+import SavedTabTitle from './SavedTabTitle'
+import SavedGrid from './SavedGrid'
+import SavedEmptyState from './SavedEmptyState'
+import type { ShortPokemon } from '@/types'
 
 type TabKey = 'favs' | 'likes'
 
@@ -15,17 +17,7 @@ export default function SavedClient() {
   const [tab, setTab] = useState<TabKey>('favs')
   const [items, setItems] = useState<ShortPokemon[]>([])
   const [isPending, startTransition] = useTransition()
-  const [counts, setCounts] = useState({ favs: 0, likes: 0 })
-
-  const readIds = (key: 'pokemon-favorites' | 'pokemon-likes') => {
-    try {
-      const raw = localStorage.getItem(key)
-      const arr = raw ? (JSON.parse(raw) as number[]) : []
-      return Array.isArray(arr) ? arr.filter((n) => Number.isInteger(n)) : []
-    } catch {
-      return []
-    }
-  }
+  const [counts, setCounts] = useState(getCounts())
 
   const load = (k: TabKey) => {
     const key = k === 'favs' ? 'pokemon-favorites' : 'pokemon-likes'
@@ -33,27 +25,18 @@ export default function SavedClient() {
     startTransition(async () => {
       const data = await getShortPokemonsByIds(ids)
       setItems(data)
-      setCounts({
-        favs: readIds('pokemon-favorites').length,
-        likes: readIds('pokemon-likes').length,
-      })
+      setCounts(getCounts())
     })
   }
 
   useEffect(() => {
-    setCounts({
-      favs: readIds('pokemon-favorites').length,
-      likes: readIds('pokemon-likes').length,
-    })
+    setCounts(getCounts())
     load(tab)
   }, [tab])
 
   useEffect(() => {
     const onStorage = () => {
-      setCounts({
-        favs: readIds('pokemon-favorites').length,
-        likes: readIds('pokemon-likes').length,
-      })
+      setCounts(getCounts())
       load(tab)
     }
     window.addEventListener('storage', onStorage)
@@ -61,6 +44,7 @@ export default function SavedClient() {
   }, [tab])
 
   const empty = items.length === 0 && !isPending
+  const currentCount = tab === 'favs' ? counts.favs : counts.likes
 
   const clearCurrent = () => {
     const key = tab === 'favs' ? 'pokemon-favorites' : 'pokemon-likes'
@@ -72,32 +56,14 @@ export default function SavedClient() {
     <>
       <div className='flex items-center justify-between'>
         <div className='text-foreground-500 font-serif'>
-          {tab === 'favs'
-            ? `${counts.favs} favoritos`
-            : `${counts.likes} me gusta`}
+          {tab === 'favs' ? `${counts.favs} favoritos` : `${counts.likes} me gusta`}
         </div>
-        <div className='flex gap-2'>
-          <Button
-            variant='solid'
-            color='danger'
-            startContent={<Trash2 className='w-4 h-4' />}
-            onPress={clearCurrent}
-            isDisabled={isPending || empty}
-            className='font-sans font-medium  tracking-tight transition-all hover:scale-105 hover:shadow-md bg-pokered-500 hover:bg-pokered-600 text-white'
-            radius='md'
-          >
-            Vaciar lista
-          </Button>
-          <Button
-            as={Link}
-            href='/pokedex'
-            variant='solid'
-            className='font-sans font-medium tracking-tight transition-all hover:scale-105 hover:shadow-lg bg-pokeblue-600 hover:bg-pokeblue-700 text-white'
-            radius='md'
-          >
-            Ir a Pokédex
-          </Button>
-        </div>
+        <SavedActions
+          tab={tab}
+          count={currentCount}
+          isPending={isPending}
+          onClear={clearCurrent}
+        />
       </div>
 
       <Tabs
@@ -108,73 +74,30 @@ export default function SavedClient() {
       >
         <Tab
           key='favs'
-          title={
-            <div className='flex items-center gap-2'>
-              <Heart className='w-4 h-4 text-pokered-500' />
-              <span>Me gusta</span>
-              <span className='text-foreground-400 text-xs'>
-                ({counts.favs})
-              </span>
-            </div>
-          }
+          title={<SavedTabTitle kind='favs' count={counts.favs} />}
         >
           {isPending ? (
             <SavedGridSkeleton />
           ) : empty ? (
-            <EmptyState kind='favs' />
+            <SavedEmptyState kind='favs' />
           ) : (
-            <Grid items={items} />
+            <SavedGrid items={items} />
           )}
         </Tab>
 
         <Tab
           key='likes'
-          title={
-            <div className='flex items-center gap-2'>
-              <Star className='w-4 h-4 text-pikachu-500' />
-              <span>Favoritos</span>
-              <span className='text-foreground-400 text-xs'>
-                ({counts.likes})
-              </span>
-            </div>
-          }
+          title={<SavedTabTitle kind='likes' count={counts.likes} />}
         >
           {isPending ? (
             <SavedGridSkeleton />
           ) : empty ? (
-            <EmptyState kind='likes' />
+            <SavedEmptyState kind='likes' />
           ) : (
-            <Grid items={items} />
+            <SavedGrid items={items} />
           )}
         </Tab>
       </Tabs>
     </>
-  )
-}
-
-function Grid({ items }: { items: ShortPokemon[] }) {
-  return (
-    <section className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4'>
-      {items.map((p) => (
-        <PokemonCard key={p.id} pokemon={p} />
-      ))}
-    </section>
-  )
-}
-
-function EmptyState({ kind }: { kind: 'favs' | 'likes' }) {
-  return (
-    <Card className='mt-6 bg-pokegray-100 border border-pokegray-200'>
-      <CardBody className='p-8 text-center'>
-        <p className='text-foreground-600'>
-          {kind === 'favs'
-            ? 'Aún no tienes Pokémon en favoritos.'
-            : 'Aún no has marcado “me gusta” en ningún Pokémon.'}
-        </p>
-        <p className='text-foreground-500 text-sm mt-1'>
-          Ve a la Pokédex y usa el ❤️ o ⭐ en las cards.
-        </p>
-      </CardBody>
-    </Card>
   )
 }

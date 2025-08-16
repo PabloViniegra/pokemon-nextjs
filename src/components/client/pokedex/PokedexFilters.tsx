@@ -65,7 +65,7 @@ export default function PokedexFilters() {
               <SlidersHorizontal className='w-4 h-4 text-pokeblue-500' />
             }
           >
-            <span className='font-medium font-sans'>Filtros</span>
+            <span className='font-medium font-sans'>Tipo</span>
             {selectedTypes.size > 0 && (
               <span className='ml-1.5 bg-pikachu-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center'>
                 {selectedTypes.size}
