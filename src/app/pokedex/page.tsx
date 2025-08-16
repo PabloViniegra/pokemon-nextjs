@@ -3,7 +3,11 @@ import PokedexSearchBar from '@/components/client/pokedex/PokedexSearchBar'
 import PokedexFilters from '@/components/client/pokedex/PokedexFilters'
 import PokedexGrid from '@/components/server/PokedexGrid'
 import { PokedexGridSkeleton } from '@/components/client/skeletons/skeletons'
-import { getAllPokemonNames, getNamesByTypes } from '@/lib/pokemon'
+import {
+  getAllPokemonNames,
+  getNamesByRegions,
+  getNamesByTypes,
+} from '@/lib/pokemon'
 import PokedexPagination from '@/components/client/pokedex/PokedexPagination'
 import { Metadata } from 'next'
 
@@ -53,7 +57,9 @@ const baseMetadata = {
 export async function generateMetadata({
   searchParams,
 }: Props): Promise<Metadata> {
-  const { q, types } = searchParams || {}
+  const q = await searchParams.q
+  const types = await searchParams.types
+
   const typesSelected = (types ?? '').split(',').filter(Boolean)
   const metadata = { ...baseMetadata }
   let title = 'Pokédex | Explore All Pokémon'
@@ -94,13 +100,14 @@ type Props = {
     page?: string
     types?: string
     perPage?: string
+    regions?: string
   }
 }
 
 export const dynamic = 'force-dynamic'
 
 export default async function Pokedex({ searchParams }: Props) {
-  const { q, page, perPage, types } = await searchParams
+  const { q, page, perPage, types, regions } = searchParams
   const qLower = (q ?? '').toLowerCase().trim()
   const pageNum = Math.max(1, Number(page ?? '1'))
   const perPageNum = Math.min(60, Math.max(10, Number(perPage ?? 20)))
@@ -111,10 +118,20 @@ export default async function Pokedex({ searchParams }: Props) {
 
   const allNames = await getAllPokemonNames()
 
+  const regionsSelected = (regions ?? '')
+    .split(',')
+    .map((r) => r.trim().toLowerCase())
+    .filter(Boolean)
+
   let filteredNames = allNames
   if (typesSelected.length > 0) {
     const byTypes = await getNamesByTypes(typesSelected)
+
     filteredNames = allNames.filter((n) => byTypes.has(n))
+  }
+  if (regionsSelected.length > 0) {
+    const byRegions = await getNamesByRegions(regionsSelected)
+    filteredNames = filteredNames.filter((n) => byRegions.has(n))
   }
 
   if (qLower) {
@@ -139,10 +156,10 @@ export default async function Pokedex({ searchParams }: Props) {
 
       <p className='text-sm text-foreground-500 font-mono'>
         {total.toLocaleString()} resultados
-        {q && (
+        {qLower && (
           <>
             {' '}
-            para “<span className='font-medium'>{q}</span>”
+            para “<span className='font-medium'>{qLower}</span>”
           </>
         )}
         {typesSelected.length > 0 && (
@@ -151,6 +168,15 @@ export default async function Pokedex({ searchParams }: Props) {
             · tipos:{' '}
             <span className='font-medium capitalize'>
               {typesSelected.join(', ')}
+            </span>
+          </>
+        )}
+        {regionsSelected.length > 0 && (
+          <>
+            {' '}
+            · regiones:{' '}
+            <span className='font-medium capitalize'>
+              {regionsSelected.join(', ')}
             </span>
           </>
         )}

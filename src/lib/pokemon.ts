@@ -3,10 +3,13 @@ import {
   EvolutionDetail,
   EvolutionNode,
   NamedAPI,
+  PokedexResp,
   Pokemon,
   PokemonList,
   RegionDetail,
+  RegionResp,
   SpeciesBreeding,
+  SpeciesFull,
   SpeciesResp,
   TypeResp,
 } from '@/types'
@@ -207,4 +210,88 @@ export async function fetchJson<T>(
   const r = await fetch(url, { next: { revalidate } })
   if (!r.ok) throw new Error(String(r.status))
   return r.json()
+}
+
+export async function getNamesByRegions(
+  regionNames: string[]
+): Promise<Set<string>> {
+  if (!regionNames?.length) return new Set<string>()
+
+  const regions = Array.from(
+    new Set(regionNames.map((r) => r.trim().toLowerCase()).filter(Boolean))
+  )
+
+  const regionDatas = await Promise.all(
+    regions.map(async (r) => {
+      try {
+        return await fetchJson<RegionResp>(`${POKEMON_API}/region/${r}`)
+      } catch {
+        return null
+      }
+    })
+  )
+
+  const REGION_TO_GENERATION: Record<string, string> = {
+    kanto: 'generation-i',
+    johto: 'generation-ii',
+    hoenn: 'generation-iii',
+    sinnoh: 'generation-iv',
+    unova: 'generation-v',
+    kalos: 'generation-vi',
+    alola: 'generation-vii',
+    galar: 'generation-viii',
+    hisui: 'generation-viii',
+    paldea: 'generation-ix',
+  }
+
+  const byGeneration = new Set<string>()
+  for (const r of regions) {
+    const genSlug = REGION_TO_GENERATION[r]
+    if (!genSlug) continue
+    try {
+      const gen = await fetchJson<{ pokemon_species: Array<{ name: string }> }>(
+        `${POKEMON_API}/generation/${genSlug}`
+      )
+      for (const sp of gen?.pokemon_species ?? []) {
+        if (sp?.name) byGeneration.add(sp.name.toLowerCase())
+      }
+    } catch {
+      console.error(`No se pudo obtener la generación para ${r}`)
+    }
+  }
+  if (byGeneration.size > 0) return byGeneration
+
+  const pokedexRefs = new Map<string, { name: string; url: string }>()
+  for (const rd of regionDatas) {
+    if (!rd?.pokedexes) continue
+    for (const p of rd.pokedexes) {
+      if (
+        typeof p?.name === 'string' &&
+        p.name.toLowerCase().includes('national')
+      )
+        continue
+      pokedexRefs.set(p.url, p)
+    }
+  }
+  if (pokedexRefs.size === 0) return new Set<string>()
+
+  const pokedexDatas = await Promise.all(
+    Array.from(pokedexRefs.values()).map(async (p) => {
+      try {
+        return await fetchJson<PokedexResp>(p.url)
+      } catch {
+        return null
+      }
+    })
+  )
+
+  const species = new Set<string>()
+  for (const pd of pokedexDatas) {
+    if (!pd?.pokemon_entries) continue
+    for (const entry of pd.pokemon_entries) {
+      const sp = entry?.pokemon_species?.name
+      if (typeof sp === 'string' && sp) species.add(sp.toLowerCase())
+    }
+  }
+  return species
 }

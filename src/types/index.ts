@@ -725,3 +725,25 @@ export type EvoDetail = {
   known_move_type?: { name: string } | null
   location?: { name: string } | null
 }
+
+export const ALL_REGIONS = [
+  'kanto',
+  'johto',
+  'hoenn',
+  'sinnoh',
+  'unova',
+  'kalos',
+  'alola',
+  'galar',
+  'paldea',
+]
+
+export type RegionResp = { pokedexes: { name: string; url: string }[] }
+export type PokedexResp = {
+  pokemon_entries: { pokemon_species: { name: string; url: string } }[]
+}
+export type SpeciesVariety = {
+  is_default: boolean
+  pokemon: { name: string; url: string }
+}
+export type SpeciesFull = { name: string; varieties: SpeciesVariety[] }
